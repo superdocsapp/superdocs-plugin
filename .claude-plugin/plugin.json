@@ -1,0 +1,43 @@
+{
+  "name": "superdocs",
+  "version": "1.0.0",
+  "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / RTF) via the SuperDocs MCP server. Single install bundles 21 MCP tools, 5 user-invocable workflow prompts, and a skill that auto-loads when document work is requested.",
+  "author": {
+    "name": "SuperDocs",
+    "email": "hello@superdocs.app",
+    "url": "https://superdocs.app"
+  },
+  "repository": "https://github.com/superdocsapp/superdocs-plugin",
+  "homepage": "https://docs.superdocs.app",
+  "license": "MIT",
+  "keywords": [
+    "document",
+    "docx",
+    "pdf",
+    "editing",
+    "mcp",
+    "ai",
+    "superdocs",
+    "contract",
+    "nda",
+    "structural-editing"
+  ],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "SuperDocs API Key",
+      "description": "Your sk_ API key from https://use.superdocs.app/ → Settings → API Keys → Create. Stored securely in your OS keychain (never in plaintext config). Free plan includes 500 AI operations per month.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "mcpServers": {
+    "superdocs": {
+      "type": "http",
+      "url": "https://api.superdocs.app/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${user_config.api_key}"
+      }
+    }
+  }
+}
