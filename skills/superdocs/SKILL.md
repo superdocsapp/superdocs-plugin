@@ -283,7 +283,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 1. **Don't dump the document HTML back into chat.** Once SuperDocs has the document loaded in a session, refer to sections by description ("the second paragraph of section 3"), not by pasting HTML back. The AI already has chunk-aware access.
 
-2. **Don't try to compute or invent chunk IDs.** Chunk IDs are SuperDocs identifiers. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying our IDs (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
+2. **Don't try to compute or invent chunk IDs.** Chunk IDs are SuperDocs identifiers. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying IDs SuperDocs already issued (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
 
 3. **`session_id` is sticky.** Use the same `session_id` across all calls for one document. Generate a new one (e.g., `user-${timestamp}`) per logical document. State persists across restarts via the SuperDocs backend.
 
