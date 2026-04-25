@@ -111,8 +111,12 @@ ARGS:
   purpose: "document"
 RETURNS: { upload_id, upload_url, curl_example }
 
-STEP 2 — Use a Bash tool to run the curl_example, which uploads
-the file directly to cloud storage.
+STEP 2 — Execute the `curl_example` yourself via your Bash tool. Do
+not paste the curl command back to the user expecting them to run it
+— uploading the file is your job, not theirs. The bytes go straight
+from disk to cloud storage; nothing flows through your context. Only
+return the curl text to the user as a fallback if you genuinely have
+no shell access.
 
 STEP 3 — TOOL: process_uploaded_document
 ARGS:
@@ -227,7 +231,13 @@ For files the user needs to download (rather than viewing inline), use the pre-s
 ```
 STEP 1 — TOOL: export_document → returns the file
 STEP 2 — TOOL: request_download_url with the resulting file's blob path
-STEP 3 — Use Bash to curl the file out to the user's local disk via the signed URL
+STEP 3 — Execute the returned curl command yourself via your Bash
+         tool to save the file to the user's working directory. Do
+         not paste the curl command back to the user expecting them
+         to run it manually — downloading is your job, not theirs.
+         Only return the URL+command as text if you genuinely have
+         no shell access, OR if the user explicitly asked for "just
+         the URL" / "the curl command".
 ```
 
 ---
