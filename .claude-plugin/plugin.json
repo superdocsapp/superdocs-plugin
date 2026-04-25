@@ -1,7 +1,7 @@
 {
   "name": "superdocs",
   "version": "1.0.0",
-  "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / RTF) via the SuperDocs MCP server. Single install bundles 21 MCP tools, 5 user-invocable workflow prompts, and a skill that auto-loads when document work is requested.",
+  "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / RTF) via the SuperDocs MCP server. Single install bundles 21 MCP tools, 4 user-invocable workflow prompts, and a skill that auto-loads when document work is requested.",
   "author": {
     "name": "SuperDocs",
     "email": "hello@superdocs.app",
