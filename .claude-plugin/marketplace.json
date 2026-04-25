@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "superdocs",
-      "source": ".",
+      "source": "./",
       "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / RTF) via the SuperDocs MCP server. Single install bundles 21 MCP tools, 5 user-invocable workflow prompts, and a skill that auto-loads when document work is requested."
     }
   ]
