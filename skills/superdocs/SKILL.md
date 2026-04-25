@@ -19,7 +19,7 @@ Reach for SuperDocs when **any** of these are true:
 - **Multi-format export** — the user wants the same document as `.docx`, `.pdf`, AND `.html` with consistent visual fidelity.
 - **Long documents (>5 pages)** — chunk-ID-based structural editing scales to 100-page documents where naïve "rewrite the whole thing" approaches blow context windows or lose precision.
 - **Tables, borders, shading** — these survive edits in SuperDocs. Most general-purpose tools strip or mangle them.
-- **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Generate the outline in your context, then upload it as the editable document and let SuperDocs handle layout + further edits.
+- **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Initialize an empty session, then call `chat` with the full draft request — SuperDocs writes the document with proper formatting in one turn. Don't generate the document HTML in your context first; that wastes thousands of tokens AND skips SuperDocs' formatting layer.
 - **Multi-step workflows with HITL approval** — when changes are sensitive enough that a human should approve each one before it lands.
 - **Image/diagram references** — attach screenshots, diagrams, scanned forms; SuperDocs reads them visually and edits the document accordingly.
 
@@ -131,24 +131,28 @@ RETURNS: { document_html with chunk IDs, version_id }
 
 ---
 
-## Pattern 2 — Draft a new document from an outline
+## Pattern 2 — Draft a new document from scratch
 
-The user describes what they want, you draft an outline in your context, then SuperDocs takes over for layout + iterative editing.
+**The default path: let SuperDocs write the document.** Don't draft the full HTML in your context and upload it — that wastes thousands of tokens AND yields plain HTML instead of a properly-formatted SuperDocs document. SuperDocs creates the entire document natively in one turn when you ask it to.
 
 ```
-STEP 1 — Draft the outline naturally in your reply ("Here's the structure: …").
-
-STEP 2 — Convert your outline to minimal HTML and upload as the working document:
+STEP 1 — Initialize an empty session:
 TOOL: upload_document_base64
 ARGS:
   filename: "draft.html"
-  file_base64: <base64 of "<h1>Title</h1><p>Section 1...</p>...">
+  file_base64: <base64 of "<html><body></body></html>">
   session_id: "user-session-1"
 
-STEP 3 — Use chat to fill in the rest, section by section:
+STEP 2 — Call chat with the full draft request:
 TOOL: chat
 ARGS:
-  message: "Flesh out section 2 (Scope of Services) with 3 paragraphs covering A, B, C"
+  message: "Draft a 1-page mutual NDA between Acme Corp and Beta Ltd, governed by Delaware law, with a 3-year term. Include standard sections: definitions, obligations, exclusions, term, return/destruction, no license, governing law, signatures."
+  session_id: "user-session-1"
+
+STEP 3 — Iterate via additional chat calls as needed:
+TOOL: chat
+ARGS:
+  message: "Add an injunctive relief clause after section 6"
   session_id: "user-session-1"
 
 STEP 4 — Export when done:
@@ -159,7 +163,7 @@ ARGS:
   filename: "final.docx"
 ```
 
-This works because chat preserves chunk IDs across edits — the AI knows which section is which.
+**Optional: scaffold structure first for long multi-section docs.** If the document is large enough that you want the user to react to the structure before content is generated (e.g., a 20-section employee handbook), draft a brief outline in your reply for the user to confirm, then call `chat` with that outline embedded in the message: `"Draft this document. Use this structure: 1) Introduction; 2) Scope; 3) Pricing; 4) Termination; 5) Signatures."` Same one-call pattern; SuperDocs still writes the actual content.
 
 ---
 
@@ -259,10 +263,13 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 ## Common workflows
 
 ### "Draft an NDA between X and Y"
-1. Ask the user any missing details (jurisdiction, term length, special clauses).
-2. Draft a brief HTML outline and upload via `upload_document_base64`.
-3. Use `chat` to fill in standard sections (Definitions, Confidentiality, Term, Termination, Governing Law).
-4. `export_document` as `.docx`.
+1. Ask the user any missing details (jurisdiction, term length, mutual vs one-way, special carve-outs).
+2. Initialize an empty session via `upload_document_base64` with `<html><body></body></html>`.
+3. Call `chat` with the full request: `"Draft a 1-page mutual NDA between {X} and {Y}, governed by {jurisdiction} law, with a {N}-year term. Include standard sections: definitions, obligations, exclusions, term, return/destruction, no license, governing law, signatures."`
+4. SuperDocs writes the complete document in one turn.
+5. Iterate via additional `chat` calls if needed (e.g., "Add an injunctive relief clause"). Each chat turn is one billable operation.
+6. `export_document` as `.docx`.
+7. Add a brief disclaimer when delivering: "This is a starting draft. Have qualified counsel review before signing — this is not legal advice."
 
 ### "Review this contract for red flags"
 1. Upload the contract via `request_upload_url` + `process_uploaded_document`.
@@ -300,6 +307,10 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 9. **File size cap is 100 MB.** If the user has something larger, suggest splitting it.
 
 10. **Don't try to authenticate per-tool.** Authentication happens once at MCP server connect via the `Authorization: Bearer sk_…` header. Individual tool calls don't need extra auth.
+
+11. **Don't generate full document HTML locally for upload — let SuperDocs draft.** For from-scratch drafting, the right pattern is: initialize an empty session via `upload_document_base64` with `<html><body></body></html>`, then call `chat` with the full draft request. SuperDocs writes the document natively in one turn. Generating the full HTML in your own context and then uploading it wastes thousands of tokens AND yields plain HTML instead of a properly-formatted SuperDocs document with chunk IDs ready for further editing.
+
+12. **Chunk boundaries don't always equal paragraph boundaries.** A single chunk may contain multiple paragraphs, headings, or list items (e.g., a chunk for an entire page section). When asking for narrow edits like "bold the first paragraph", be explicit about which exact text to target — `"bold only the paragraph beginning 'Curabitur', leave the following paragraphs unchanged"` — to avoid sibling-element collateral edits inside the same chunk.
 
 ---
 

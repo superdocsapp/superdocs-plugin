@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
   "name": "app.superdocs/superdocs",
-  "description": "Universal AI document editor — chunk-precise edits with style preservation, multimodal vision, human-in-the-loop approval, and pre-signed URL upload/download. Edit contracts, NDAs, proposals, RFPs, academic papers, technical specs, SOPs from Claude Code, Cursor, Windsurf, Claude Desktop, VS Code, Continue, Zed. 21 tools + 5 user-invocable workflow prompts on a single endpoint. Free tier: 500 operations/month. Sign up: https://use.superdocs.app",
+  "description": "Universal AI document editor — chunk-precise edits with style preservation, multimodal vision, human-in-the-loop approval, and pre-signed URL upload/download. Edit contracts, NDAs, proposals, RFPs, academic papers, technical specs, SOPs from Claude Code, Cursor, Windsurf, Claude Desktop, VS Code, Continue, Zed. 21 tools + 4 user-invocable workflow prompts on a single endpoint. Free tier: 500 operations/month. Sign up: https://use.superdocs.app",
   "version": "1.0.0",
   "repository": {
     "url": "https://github.com/superdocsapp/superdocs-plugin",
