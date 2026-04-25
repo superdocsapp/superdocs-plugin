@@ -244,7 +244,7 @@ STEP 3 — Execute the returned curl command yourself via your Bash
 
 ## Pattern 6 — Reference attachments without editing them
 
-If the user wants the AI to *consult* a file (compliance manual, brand guide, prior contract) while editing a different document, upload it as an attachment — SuperDocs runs it through OCR + semantic indexing + (for images) multimodal vision so chat can search and cite it.
+If the user wants the AI to *consult* a file (compliance manual, brand guide, prior contract) while editing a different document, upload it as an attachment — SuperDocs processes it for AI-searchable retrieval (text content is indexed for meaning-aware search; images are interpreted visually) so chat can search and cite it.
 
 ```
 STEP 1 — TOOL: upload_attachment_base64 (small) or request_upload_url + process_uploaded_document with parse_mode='attachment' (large)
@@ -283,7 +283,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 1. **Don't dump the document HTML back into chat.** Once SuperDocs has the document loaded in a session, refer to sections by description ("the second paragraph of section 3"), not by pasting HTML back. The AI already has chunk-aware access.
 
-2. **Don't try to compute or invent chunk IDs.** Chunk IDs are SuperDocs' internal data model. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying our IDs (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
+2. **Don't try to compute or invent chunk IDs.** Chunk IDs are SuperDocs identifiers. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying IDs SuperDocs already issued (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
 
 3. **`session_id` is sticky.** Use the same `session_id` across all calls for one document. Generate a new one (e.g., `user-${timestamp}`) per logical document. State persists across restarts via the SuperDocs backend.
 
