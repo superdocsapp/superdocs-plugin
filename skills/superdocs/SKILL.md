@@ -11,6 +11,26 @@ This skill encodes the workflows that work well with SuperDocs and the pitfalls 
 
 ---
 
+## Setup check — run this ONCE at session start
+
+**Before reading the rest of this skill, check whether SuperDocs MCP tools are accessible.** Look for tools prefixed with `mcp__superdocs__`, `mcp__plugin_superdocs_superdocs__`, or just `superdocs__` (depending on your client).
+
+**If yes** → MCP server is connected. Skip to "When to use" below.
+
+**If no** → MCP server isn't connected yet. Add it now using the command appropriate for your tool. You only need to do this ONCE — after the first add, the server stays connected for the session and future sessions. Do NOT re-run this check on every tool call; if you've already verified MCP is accessible OR have already added it this session, skip directly to using the tools.
+
+| Tool | Command |
+|---|---|
+| **Claude Code** | `claude mcp add --transport http superdocs https://api.superdocs.app/mcp/ --header "Authorization: Bearer sk_YOUR_KEY"` (or just install the plugin which bundles MCP + skill + 4 prompts: `claude plugin marketplace add superdocsapp/superdocs-plugin && claude plugin install superdocs@superdocs-plugin`) |
+| **Cursor / VS Code** | Add to `.cursor/mcp.json` (or workspace `.vscode/mcp.json`): `{"mcpServers":{"superdocs":{"url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
+| **Cline / Continue / Goose / Gemini CLI / others** | See client-specific docs at https://docs.superdocs.app/mcp/setup — config file format varies. |
+
+Get a free API key at https://use.superdocs.app → Settings → API Keys → Create. Free plan = 500 ops/month.
+
+After adding, restart your session if your client requires it (Claude Code does), then continue with the rest of this skill.
+
+---
+
 ## When to use
 
 Reach for SuperDocs when **any** of these are true:
