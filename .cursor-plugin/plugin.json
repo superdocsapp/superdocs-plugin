@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cursor/plugins/main/schemas/plugin.schema.json",
+  "name": "superdocs",
+  "displayName": "SuperDocs",
+  "version": "1.0.0",
+  "description": "Structured-document editor for AI agents — section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download for .docx, PDF, HTML, Markdown, RTF documents.",
+  "author": {
+    "name": "SuperDocs",
+    "email": "hello@superdocs.app"
+  },
+  "homepage": "https://docs.superdocs.app",
+  "repository": "https://github.com/superdocsapp/superdocs-plugin",
+  "license": "MIT",
+  "keywords": [
+    "document",
+    "docx",
+    "pdf",
+    "editing",
+    "mcp",
+    "ai",
+    "structural-editing",
+    "contract",
+    "nda",
+    "templates"
+  ],
+  "skills": "./skills/",
+  "commands": [
+    "commands/superdocs-setup.md"
+  ],
+  "mcpServers": {
+    "superdocs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://api.superdocs.app/mcp/",
+        "--header",
+        "Authorization: Bearer ${SUPERDOCS_API_KEY}"
+      ],
+      "env": {
+        "SUPERDOCS_API_KEY": "${SUPERDOCS_API_KEY}"
+      }
+    }
+  }
+}
