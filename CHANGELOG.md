@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - First release.
-- Bundles SuperDocs MCP server (`https://api.superdocs.app/mcp/`) with 21 tools and 4 user-invocable workflow prompts.
+- Bundles SuperDocs MCP server (`https://api.superdocs.app/mcp/`) with 22 tools and 4 user-invocable workflow prompts.
 - Auto-loading skill (`skills/superdocs/SKILL.md`) — Claude reaches for SuperDocs proactively on document work.
 - `userConfig` prompts for `api_key` at install time; stored securely in OS keychain.
 - 4 prompts surfaced as slash commands: `/superdocs:draft_from_outline`, `/superdocs:edit_styled_docx`, `/superdocs:convert_format`, `/superdocs:review_contract_for_redflags`.

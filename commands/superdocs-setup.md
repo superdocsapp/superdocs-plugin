@@ -3,7 +3,7 @@ name: superdocs-setup
 description: One-time SuperDocs setup — get a free API key and configure the SUPERDOCS_API_KEY environment variable so Cursor can connect to the MCP server.
 ---
 
-You are helping the user set up SuperDocs in Cursor for the first time. SuperDocs is a structured-document editor — it gives the user 21 MCP tools and 4 workflow prompts for editing, drafting, summarizing, and exporting `.docx`, PDF, HTML, Markdown, and RTF files. The MCP server connects via a stdio bridge (`npx mcp-remote`) using an `sk_` API key the user holds in the `SUPERDOCS_API_KEY` environment variable.
+You are helping the user set up SuperDocs in Cursor for the first time. SuperDocs is a structured-document editor — it gives the user 22 MCP tools and 4 workflow prompts for editing, drafting, summarizing, and exporting `.docx`, PDF, HTML, Markdown, and RTF files. The MCP server connects via a stdio bridge (`npx mcp-remote`) using an `sk_` API key the user holds in the `SUPERDOCS_API_KEY` environment variable.
 
 Walk the user through this setup interactively. Be helpful, concise, and verify each step before moving on.
 

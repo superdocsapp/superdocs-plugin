@@ -334,9 +334,9 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
-## Tool reference (21 tools — full descriptions in `available-tools.mdx`)
+## Tool reference (22 tools — full descriptions in `available-tools.mdx`)
 
-**Chat & editing:** `chat`, `chat_async`, `approve_change`
+**Chat & editing:** `chat`, `chat_async`, `approve_change`, `revert_session_to_message`
 **Document upload/parse:** `upload_document_base64`, `request_upload_url`, `process_uploaded_document`
 **Document export/download:** `export_document`, `request_download_url`
 **Sessions:** `list_sessions`, `get_session_history`, `get_session_jobs`

@@ -3,7 +3,7 @@
 Edit, draft, search, summarize, and export styled documents (`.docx` / PDF / HTML / Markdown / RTF) directly from Claude Code via the SuperDocs MCP server.
 
 A single `/plugin install` command bundles:
-- **21 MCP tools** — chat, structural editing, attachments, sessions, jobs, templates, pre-signed upload/download
+- **22 MCP tools** — chat, structural editing, attachments, sessions, jobs, templates, pre-signed upload/download
 - **4 user-invocable workflow prompts** — `/superdocs:draft_from_outline`, `/superdocs:edit_styled_docx`, `/superdocs:convert_format`, `/superdocs:review_contract_for_redflags`
 - **Auto-loading skill** — Claude reaches for SuperDocs proactively when you ask to edit, draft, or export documents
 
