@@ -1,6 +1,6 @@
 ---
 name: superdocs
-description: Edit, create, restructure, and export styled documents (.docx, PDF, HTML, Markdown, RTF) via the SuperDocs MCP server. Preserves tables, borders, shading, fonts, and inline styling on both edit and export. Use this skill when the user wants to work with formatted documents — drafting NDAs/contracts/SOPs from outlines, editing specific clauses without affecting surrounding content, converting between formats with fidelity, or running multi-step document workflows where format preservation matters more than plain text generation.
+description: Edit, create, restructure, and export styled documents (.docx, PDF, HTML, Markdown, plain text) via the SuperDocs MCP server. Preserves tables, borders, shading, fonts, and inline styling on both edit and export. Use this skill when the user wants to work with formatted documents — drafting NDAs/contracts/SOPs from outlines, editing specific clauses without affecting surrounding content, converting between formats with fidelity, or running multi-step document workflows where format preservation matters more than plain text generation.
 ---
 
 # SuperDocs Skill
@@ -74,7 +74,7 @@ The user installs the SuperDocs MCP server in their AI tool's config. They need 
 }
 ```
 
-Restart Claude Code. The 21 SuperDocs tools become available; this skill auto-loads when document work is requested.
+Restart Claude Code. The 33 SuperDocs tools become available; this skill auto-loads when document work is requested.
 
 ### Cursor / VS Code
 
@@ -144,10 +144,10 @@ ARGS:
   filename: "long-contract.docx"
   session_id: "user-session-1"
   parse_mode: "document"   # or "attachment" for read-only reference
-RETURNS: { document_html with chunk IDs, version_id }
+RETURNS: { document_html with chunk IDs }
 ```
 
-**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — for Claude Sonnet 4.6 that's ~70% of your window gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
+**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — in a typical 200K-token context window that's ~70% gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
 
 ---
 
@@ -253,9 +253,11 @@ ARGS:
 For files the user needs to download (rather than viewing inline), use the pre-signed download URL flow:
 
 ```
-STEP 1 — TOOL: export_document → returns the file
-STEP 2 — TOOL: request_download_url with the resulting file's blob path
-STEP 3 — Execute the returned curl command yourself via your Bash
+STEP 1 — TOOL: request_download_url with session_id (it re-exports the
+         session's current document and returns a short-lived signed
+         download URL + a curl command). Args: session_id (required),
+         format ("docx"/"pdf"/"html"/"markdown"/"txt"), optional filename.
+STEP 2 — Execute the returned curl command yourself via your Bash
          tool to save the file to the user's working directory. Do
          not paste the curl command back to the user expecting them
          to run it manually — downloading is your job, not theirs.
@@ -334,15 +336,24 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
-## Tool reference (22 tools — full descriptions in `available-tools.mdx`)
+## Tool reference (33 tools — full descriptions in `available-tools.mdx`)
 
-**Chat & editing:** `chat`, `chat_async`, `approve_change`, `revert_session_to_message`
+**Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`
+**Multi-document sessions (tabs):** `init_session`, `open_documents`, `list_session_documents`, `focus_session_document`, `close_session_document`
+**Files (durable, reusable documents):** `list_documents`, `get_document_detail`, `rename_document`, `archive_document`
 **Document upload/parse:** `upload_document_base64`, `request_upload_url`, `process_uploaded_document`
 **Document export/download:** `export_document`, `request_download_url`
 **Sessions:** `list_sessions`, `get_session_history`, `get_session_jobs`
 **Attachments (reference files):** `upload_attachment_base64`, `delete_attachment`, `get_attachment_status`
 **Async jobs:** `list_jobs`, `get_job`, `cancel_job`
 **Templates:** `upload_template_base64`, `list_user_templates`, `delete_user_template`
+**Cross-session memory:** `clear_cross_session_memory`
 **Health:** `health`
+
+**Token-light reads:** the session-roster + Files tools (`list_session_documents`, `open_documents`, `init_session`, `focus_session_document`, `close_session_document`, `list_documents`) return metadata only by default (ids, title, section counts, focused, page setup) — pass `include_html=true` only when you actually need a document's body.
+
+**`chat` / `chat_async` extras:** `document_id` targets one open tab in a multi-document session (ids come from `list_session_documents`; omit to edit the focused doc). `response_mode='compact'` skips the full HTML and returns per-section `chunk_diffs` (each carries its `document_id`). If a large edit pauses (the job sits at `awaiting_approval` with `awaiting_kind='continue_prompt'`), resume it with `continue_chat` — NOT `approve_change`. Cross-session context (off by default): `cross_session_memory` / `cross_session_search`, plus `cross_session_scope` (limit search to specific sessions) and `cross_session_memory_key` (keep one end-customer's memory separate).
+
+**Headless event delivery:** with `chat_async`, poll `get_job` — `metadata.intermediate_responses` carries the same typed progress events the web stream delivers (`documents_changed`, `continue_prompt`, `model_fallback`, `proposed_change_batch`). Cross-session document changes made by OTHER sessions are reported separately by polling `GET /v1/sessions/{id}/doc-events`.
 
 For full schemas and parameter descriptions, see the [SuperDocs MCP tools reference](https://docs.superdocs.app/mcp/available-tools).

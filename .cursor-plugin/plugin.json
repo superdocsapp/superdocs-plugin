@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/cursor/plugins/main/schemas/plugin.schema.json",
   "name": "superdocs",
   "displayName": "SuperDocs",
-  "version": "1.0.0",
-  "description": "Structured-document editor for AI agents — section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download for .docx, PDF, HTML, Markdown, RTF documents.",
+  "version": "1.1.0",
+  "description": "Structured-document editor for AI agents — section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download. Exports .docx, PDF, HTML, Markdown, plain text; also ingests .doc and RTF.",
   "author": {
     "name": "SuperDocs",
     "email": "hello@superdocs.app"
