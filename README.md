@@ -67,6 +67,8 @@ Plugin auto-updates whenever a new version is published. Pin a specific version 
 | Claude Code | ✅ | ✅ | ✅ |
 | Claude Desktop | ✅ (via MCP) | ✅ | ⚠️ skill format support varies |
 | Cursor | ✅ (via MCP or the bundled `.cursor-plugin/` install) | ✅ | ⚠️ |
+| VS Code (GitHub Copilot) | ✅ (via MCP) | ✅ | ⚠️ |
+| Zed, Continue, Amazon Q CLI, and others | ✅ (via MCP) | ✅ | ⚠️ |
 | Windsurf, Cline | ✅ (tools only) | ❌ (clients don't surface MCP prompts) | ❌ |
 
 For non-Claude-Code clients, install the MCP server directly per the [SuperDocs MCP setup docs](https://docs.superdocs.app/mcp/setup).
