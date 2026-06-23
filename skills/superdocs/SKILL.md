@@ -74,7 +74,7 @@ The user installs the SuperDocs MCP server in their AI tool's config. They need 
 }
 ```
 
-Restart Claude Code. The 33 SuperDocs tools become available; this skill auto-loads when document work is requested.
+Restart Claude Code. The 35 SuperDocs tools become available; this skill auto-loads when document work is requested.
 
 ### Cursor / VS Code
 
@@ -336,11 +336,11 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
-## Tool reference (33 tools — full descriptions in `available-tools.mdx`)
+## Tool reference (35 tools — full descriptions in `available-tools.mdx`)
 
-**Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`
+**Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`, `redo_revert`
 **Multi-document sessions (tabs):** `init_session`, `open_documents`, `list_session_documents`, `focus_session_document`, `close_session_document`
-**Files (durable, reusable documents):** `list_documents`, `get_document_detail`, `rename_document`, `archive_document`
+**Files (durable, reusable documents):** `list_documents`, `get_document_detail`, `rename_document`, `archive_document`, `unarchive_document`
 **Document upload/parse:** `upload_document_base64`, `request_upload_url`, `process_uploaded_document`
 **Document export/download:** `export_document`, `request_download_url`
 **Sessions:** `list_sessions`, `get_session_history`, `get_session_jobs`
