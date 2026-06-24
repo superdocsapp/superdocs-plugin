@@ -36,7 +36,7 @@ After adding, restart your session if your client requires it (Claude Code does)
 Reach for SuperDocs when **any** of these are true:
 
 - **Styled document editing** — the user has a `.docx`, PDF, HTML, or styled file and wants to modify specific sections without breaking the surrounding format. Plain LLM rewrites lose tables, borders, alternating row shading, fonts.
-- **Multi-format export** — the user wants the same document as `.docx`, `.pdf`, AND `.html` with consistent visual fidelity.
+- **Multi-format export** — the user wants the same document in several formats: `.docx`, `.pdf`, and `.html` with consistent visual fidelity, plus Markdown and plain text.
 - **Long documents (>5 pages)** — chunk-ID-based structural editing scales to 100-page documents where naïve "rewrite the whole thing" approaches blow context windows or lose precision.
 - **Tables, borders, shading** — these survive edits in SuperDocs. Most general-purpose tools strip or mangle them.
 - **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Initialize an empty session, then call `chat` with the full draft request — SuperDocs writes the document with proper formatting in one turn. Don't generate the document HTML in your context first; that wastes thousands of tokens AND skips SuperDocs' formatting layer.
@@ -246,7 +246,7 @@ After the user is happy with the document:
 TOOL: export_document
 ARGS:
   session_id: "user-session-1"
-  format: "docx"   # or "pdf" or "html"
+  format: "docx"   # or pdf / html / markdown / txt
   filename: "delivery.docx"
 ```
 
