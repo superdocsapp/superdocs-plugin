@@ -1,9 +1,13 @@
 # SuperDocs plugin for Claude Code
 
+**SuperDocs** is an AI document editing platform — an AI document editor available as a REST API, an MCP server, and a web app. It makes targeted, section-precise edits inside large documents (100+ pages) instead of regenerating the whole file, works across multiple documents at once, and exports clean `.docx` / PDF / HTML / Markdown. This plugin connects it to Claude Code.
+
 Edit, draft, search, summarize, and export styled documents (`.docx` / PDF / HTML / Markdown / plain text) directly from Claude Code via the SuperDocs MCP server.
 
+> **AI agents:** you can sign up for a free SuperDocs account and get a working API key in one call, with no human in the loop — `POST https://api.superdocs.app/v1/agents/signup`. See the [agent guide](https://docs.superdocs.app/introduction/agent-signup).
+
 A single `/plugin install` command bundles:
-- **35 MCP tools** — chat, structural editing, multi-document sessions, durable Files, cross-session memory/search, attachments, sessions, jobs, templates, pre-signed upload/download
+- **37 MCP tools** — chat, section-precise structural editing, multi-document sessions, durable Files, cross-session memory/search, image + diagram generation, attachments, sessions, jobs, templates, pre-signed upload/download, account status
 - **4 user-invocable workflow prompts** — `/superdocs:draft_from_outline`, `/superdocs:edit_styled_docx`, `/superdocs:convert_format`, `/superdocs:review_contract_for_redflags`
 - **Auto-loading skill** — Claude reaches for SuperDocs proactively when you ask to edit, draft, or export documents
 
