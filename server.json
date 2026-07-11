@@ -1,8 +1,8 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "app.superdocs/superdocs",
-  "description": "Edit, draft, summarize, export styled .docx/PDF/HTML/MD/plain text via 35 MCP tools + 4 prompts.",
-  "version": "1.1.0",
+  "description": "AI document editing for agents: draft, edit, export .docx/PDF. 37 MCP tools; agent self-signup.",
+  "version": "1.2.0",
   "repository": {
     "url": "https://github.com/superdocsapp/superdocs-plugin",
     "source": "github"
