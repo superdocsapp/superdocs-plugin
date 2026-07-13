@@ -9,7 +9,7 @@ description: One-time SuperDocs setup for Cursor — get a free API key and conf
 >
 > **On Claude Code, do NOT follow these steps.** The Claude Code plugin authenticates differently: install with `claude plugin install superdocsapp/superdocs-plugin`, and you'll be prompted for your `sk_` API key once at install time. It's stored securely in your OS keychain — there's no `SUPERDOCS_API_KEY` env var to set and nothing to restart. See the [README](../README.md) or [docs](https://docs.superdocs.app/mcp/setup).
 
-You are helping the user set up SuperDocs in Cursor for the first time. SuperDocs is a structured-document editor — it gives the user 35 MCP tools and 4 workflow prompts for editing, drafting, summarizing, and exporting documents. It exports to `.docx`, PDF, HTML, Markdown, and plain text, and ingests `.pdf`, `.docx`, `.txt`, `.rtf`, `.md`, `.html`, and `.htm`. The MCP server connects via a stdio bridge (`npx mcp-remote`) using an `sk_` API key the user holds in the `SUPERDOCS_API_KEY` environment variable.
+You are helping the user set up SuperDocs in Cursor for the first time. SuperDocs is a structured-document editor — it gives the user 37 MCP tools and 4 workflow prompts for editing, drafting, summarizing, and exporting documents. It exports to `.docx`, PDF, HTML, Markdown, and plain text, and ingests `.pdf`, `.docx`, `.txt`, `.rtf`, `.md`, `.html`, and `.htm`. The MCP server connects via a stdio bridge (`npx mcp-remote`) using an `sk_` API key the user holds in the `SUPERDOCS_API_KEY` environment variable.
 
 Walk the user through this setup interactively. Be helpful, concise, and verify each step before moving on.
 

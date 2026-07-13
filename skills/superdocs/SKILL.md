@@ -5,7 +5,7 @@ description: Edit, create, restructure, and export styled documents (.docx, PDF,
 
 # SuperDocs Skill
 
-A skill for AI agents (Claude Code, Cursor, Claude Desktop, Windsurf, VS Code Copilot, etc.) connecting to the SuperDocs MCP server at `https://api.superdocs.app/mcp`.
+A skill for AI agents (Claude Code, Cursor, Claude Desktop, Windsurf, VS Code Copilot, etc.) connecting to the SuperDocs MCP server at `https://api.superdocs.app/mcp/`.
 
 This skill encodes the workflows that work well with SuperDocs and the pitfalls to avoid. Read the section that matches what the user is asking for; you don't need the whole file.
 
@@ -22,7 +22,8 @@ This skill encodes the workflows that work well with SuperDocs and the pitfalls 
 | Tool | Command |
 |---|---|
 | **Claude Code** | `claude mcp add --transport http superdocs https://api.superdocs.app/mcp/ --header "Authorization: Bearer sk_YOUR_KEY"` (or just install the plugin which bundles MCP + skill + 4 prompts: `claude plugin marketplace add superdocsapp/superdocs-plugin && claude plugin install superdocs@superdocs-plugin`) |
-| **Cursor / VS Code** | Add to `.cursor/mcp.json` (or workspace `.vscode/mcp.json`): `{"mcpServers":{"superdocs":{"url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
+| **Cursor** | Add to `.cursor/mcp.json`: `{"mcpServers":{"superdocs":{"url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
+| **VS Code** | Add to workspace `.vscode/mcp.json` (or the user-level `mcp.json` via **MCP: Open User Configuration**): `{"servers":{"superdocs":{"type":"http","url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
 | **Cline / Continue / Goose / Gemini CLI / others** | See client-specific docs at https://docs.superdocs.app/mcp/setup — config file format varies. |
 
 Get a free API key at https://use.superdocs.app → Settings → API Keys → Create. Free plan = 500 ops/month.
@@ -54,7 +55,7 @@ Skip SuperDocs (use plain text generation or a different tool) when:
 
 ---
 
-## Quick start (3 install patterns)
+## Quick start (4 install patterns)
 
 The user installs the SuperDocs MCP server in their AI tool's config. They need an API key from `https://use.superdocs.app` (Settings → API Keys → Create). Keys look like `sk_a1b2c3d4...`.
 
@@ -67,24 +68,40 @@ The user installs the SuperDocs MCP server in their AI tool's config. They need 
   "mcpServers": {
     "superdocs": {
       "type": "http",
-      "url": "https://api.superdocs.app/mcp",
+      "url": "https://api.superdocs.app/mcp/",
       "headers": { "Authorization": "Bearer sk_YOUR_API_KEY" }
     }
   }
 }
 ```
 
-Restart Claude Code. The 35 SuperDocs tools become available; this skill auto-loads when document work is requested.
+Restart Claude Code. The 37 SuperDocs tools become available; this skill auto-loads when document work is requested.
 
-### Cursor / VS Code
+### Cursor
 
-`mcp.json` in the project or workspace:
+`.cursor/mcp.json` in the project root (or global Cursor config):
 
 ```json
 {
   "mcpServers": {
     "superdocs": {
-      "url": "https://api.superdocs.app/mcp",
+      "url": "https://api.superdocs.app/mcp/",
+      "headers": { "Authorization": "Bearer sk_YOUR_API_KEY" }
+    }
+  }
+}
+```
+
+### VS Code
+
+Workspace `.vscode/mcp.json` (or the user-level `mcp.json`, opened with the **MCP: Open User Configuration** command). Note VS Code uses a `servers` key and a `type` field:
+
+```json
+{
+  "servers": {
+    "superdocs": {
+      "type": "http",
+      "url": "https://api.superdocs.app/mcp/",
       "headers": { "Authorization": "Bearer sk_YOUR_API_KEY" }
     }
   }
@@ -100,7 +117,7 @@ Restart Claude Code. The 35 SuperDocs tools become available; this skill auto-lo
   "mcpServers": {
     "superdocs": {
       "command": "npx",
-      "args": ["mcp-remote", "https://api.superdocs.app/mcp", "--header", "Authorization: Bearer sk_YOUR_API_KEY"]
+      "args": ["mcp-remote", "https://api.superdocs.app/mcp/", "--header", "Authorization: Bearer sk_YOUR_API_KEY"]
     }
   }
 }
@@ -204,6 +221,25 @@ ARGS:
 In compact mode the response includes only `chunk_diffs` (per-section before/after) for the chunks that actually changed — typically 1-3 chunks, ~500-2,000 tokens total. The same 5-turn editing session above drops from ~650K tokens to ~3K tokens.
 
 **To read a section in compact mode**, just ask for it in natural language — `"show me the force majeure clause"` or `"what does section 4.2 currently say?"`. The AI returns the content in the chat reply text. You don't need to know about chunk IDs and shouldn't try to query for them.
+
+---
+
+## Pattern 3b — Editing reliably (say what you mean, verify for free)
+
+The AI picks the operation from your message — three intents cover editing:
+
+- **Add** content → "Add an Appendix A after Section 9". A new section lands at the named position; nothing else changes. Never ask for a full regeneration to add one section.
+- **Change** content → "Rewrite Section 6 to …". Section rewrites are ATOMIC: the whole heading-to-next-heading span is replaced — no stale paragraphs left behind.
+- **Rebuild** → "Replace the entire document with …". Only happens on an explicit whole-document ask.
+
+Also built in:
+
+- **Find-and-modify is one request** — "find the line that says X and replace it with Y" performs the edit; no separate search step.
+- **Placement is honored** — "at the top", "in Section 2", "replace the [COVER] placeholder". A named position that can't be resolved fails honestly (never silently appended at the end). "Move the org chart into Section 2" relocates the original — no duplication.
+- **Page breaks & TOC** — "page break before each section" inserts real markers (true Word page breaks / PDF breaks on export); "add a table of contents" inserts a live TOC that self-updates from headings.
+- **Verify for free** — `get_document_detail` always includes a `structure` outline (headings, section_count, block_count, media). Check it after edits you care about; never burn an export just to verify.
+- **Failed operations bill 0** — if the reply says the edit couldn't be completed, you were not charged. Most requests bill 1 op; very large creations bill 1 per 25 sections.
+- **Document-scale generations → `chat_async`** — sync chat gateway-times-out past ~300s; async returns a `job_id` immediately and reports progress via `get_job`.
 
 ---
 
@@ -336,7 +372,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
-## Tool reference (35 tools — full descriptions in `available-tools.mdx`)
+## Tool reference (37 tools — full descriptions in `available-tools.mdx`)
 
 **Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`, `redo_revert`
 **Multi-document sessions (tabs):** `init_session`, `open_documents`, `list_session_documents`, `focus_session_document`, `close_session_document`
@@ -345,9 +381,11 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 **Document export/download:** `export_document`, `request_download_url`
 **Sessions:** `list_sessions`, `get_session_history`, `get_session_jobs`
 **Attachments (reference files):** `upload_attachment_base64`, `delete_attachment`, `get_attachment_status`
+**Images:** `upload_image_base64` (upload an image as base64, get back a hosted URL to reference in chat: "insert my logo at the top")
 **Async jobs:** `list_jobs`, `get_job`, `cancel_job`
 **Templates:** `upload_template_base64`, `list_user_templates`, `delete_user_template`
 **Cross-session memory:** `clear_cross_session_memory`
+**Account:** `get_account_status` (tier, operations used/remaining this month, reset date; non-billable)
 **Health:** `health`
 
 **Token-light reads:** the session-roster + Files tools (`list_session_documents`, `open_documents`, `init_session`, `focus_session_document`, `close_session_document`, `list_documents`) return metadata only by default (ids, title, section counts, focused, page setup) — pass `include_html=true` only when you actually need a document's body.
