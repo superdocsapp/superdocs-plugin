@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/cursor/plugins/main/schemas/plugin.schema.json",
   "name": "superdocs",
   "displayName": "SuperDocs",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Structured-document editor for AI agents — 37 MCP tools for section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download. Exports .docx, PDF, HTML, Markdown, plain text; ingests .pdf, .docx, .txt, .rtf, .md, .html, .htm.",
   "author": {
     "name": "SuperDocs",

@@ -5,6 +5,16 @@ All notable changes to the SuperDocs Claude Code plugin will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-16
+
+### Added
+- **Tool count is now 37** (up from 35) — the bundled MCP server gained two tools:
+  - **`get_account_status`** — check your tier, operations used and remaining this month, and the reset date (non-billable). Lets an agent watch its own quota before it hits the cap.
+  - **`upload_image_base64`** — upload an image as base64 and get back a hosted URL to reference in chat (e.g. "insert my logo at the top").
+
+### Fixed
+- **Install is now a two-step marketplace flow.** Register the marketplace with `claude plugin marketplace add superdocsapp/superdocs-plugin`, then install with `claude plugin install superdocs@superdocs-plugin`. The old one-step `claude plugin install superdocsapp/superdocs-plugin` fails with "doesn't exist in marketplace", because that GitHub repo path is only valid for `marketplace add`, not for `install`. The README and the `superdocs-setup` command are corrected to match.
+
 ## [1.1.0] - 2026-06-23
 
 ### Added

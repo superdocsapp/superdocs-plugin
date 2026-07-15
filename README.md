@@ -15,11 +15,14 @@ A single `/plugin install` command bundles:
 
 You'll need a free SuperDocs API key first — sign up at [use.superdocs.app](https://use.superdocs.app), then **Settings → API Keys → Create**. Free plan includes 500 AI operations per month.
 
-In Claude Code, run:
+In Claude Code, add the SuperDocs marketplace, then install the plugin from it:
 
 ```bash
-claude plugin install superdocsapp/superdocs-plugin
+claude plugin marketplace add superdocsapp/superdocs-plugin
+claude plugin install superdocs@superdocs-plugin
 ```
+
+The install argument is `superdocs@superdocs-plugin` (plugin name @ marketplace), not the GitHub repo path. Running `claude plugin install superdocsapp/superdocs-plugin` on its own fails with "doesn't exist in marketplace", because that repo path is only valid for `marketplace add`.
 
 You'll be prompted for your API key. It's stored securely in your OS keychain — never in plaintext config.
 
@@ -62,7 +65,7 @@ If you'd rather configure the MCP server directly without the plugin (e.g., to s
 
 ## Updates
 
-Plugin auto-updates whenever a new version is published. Pin a specific version with `claude plugin install superdocsapp/superdocs-plugin@1.1.0` if you need stability.
+Plugin auto-updates whenever a new version is published. To pull the latest immediately, run `claude plugin update superdocs`.
 
 ## Compatibility
 
