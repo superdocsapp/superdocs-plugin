@@ -5,6 +5,11 @@ All notable changes to the SuperDocs Claude Code plugin will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.3.0 — 2026-07-17
+
+- **Tool count is now 38** (up from 37) — new `request_limit_increase` tool: request higher document/chat scale limits for your account in one call after a `413` `DOCUMENT_TOO_COMPLEX` / `SESSION_TOO_FULL` (these are stability limits, not hard caps; the team is notified with your account details and typically expands limits within a day).
+- Scale-limit errors now speak in pages and carry `request_increase` machine fields (`mcp_tool`, `endpoint`, `agent_hint`) so agents learn the expansion path directly from the error.
+
 ## [1.2.0] - 2026-07-16
 
 ### Added

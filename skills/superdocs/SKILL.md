@@ -75,7 +75,7 @@ The user installs the SuperDocs MCP server in their AI tool's config. They need 
 }
 ```
 
-Restart Claude Code. The 37 SuperDocs tools become available; this skill auto-loads when document work is requested.
+Restart Claude Code. The 38 SuperDocs tools become available; this skill auto-loads when document work is requested.
 
 ### Cursor
 
@@ -372,7 +372,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
-## Tool reference (37 tools — full descriptions in `available-tools.mdx`)
+## Tool reference (38 tools — full descriptions in `available-tools.mdx`)
 
 **Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`, `redo_revert`
 **Multi-document sessions (tabs):** `init_session`, `open_documents`, `list_session_documents`, `focus_session_document`, `close_session_document`
@@ -386,6 +386,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 **Templates:** `upload_template_base64`, `list_user_templates`, `delete_user_template`
 **Cross-session memory:** `clear_cross_session_memory`
 **Account:** `get_account_status` (tier, operations used/remaining this month, reset date; non-billable)
+- `request_limit_increase` — one-call request for higher document/chat scale limits after a 413 DOCUMENT_TOO_COMPLEX / SESSION_TOO_FULL (stability limits, expandable per account, typically within a day)
 **Health:** `health`
 
 **Token-light reads:** the session-roster + Files tools (`list_session_documents`, `open_documents`, `init_session`, `focus_session_document`, `close_session_document`, `list_documents`) return metadata only by default (ids, title, section counts, focused, page setup) — pass `include_html=true` only when you actually need a document's body.
