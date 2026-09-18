@@ -5,6 +5,13 @@ All notable changes to the SuperDocs Claude Code plugin will be documented in th
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Repository validation** — `node scripts/validate-plugin.mjs` checks the plugin manifests, `server.json`, `commands/`, and the documented tool/workflow references for the drift that has caused several past releases to disagree with themselves. Runs on every pull request via `.github/workflows/validate-plugin.yml`. No dependencies and no `package.json`.
+- `scripts/known-tools.json` — registry of the MCP tools and the workflow prompts served by the remote MCP server, i.e. the things this repository documents but cannot discover locally. Local commands are not listed there; `commands/*.md` is authoritative for those.
+- `CONTRIBUTING.md` — how to run the validator and what to update when adding a tool or a command.
+
 ## v1.3.0 — 2026-07-17
 
 - **Tool count is now 38** (up from 37) — new `request_limit_increase` tool: request higher document/chat scale limits for your account in one call after a `413` `DOCUMENT_TOO_COMPLEX` / `SESSION_TOO_FULL` (these are stability limits, not hard caps; the team is notified with your account details and typically expands limits within a day).
