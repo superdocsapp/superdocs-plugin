@@ -50,6 +50,20 @@ Export the current document as .docx and give me a pre-signed download URL.
 
 For more, see the [SuperDocs documentation](https://docs.superdocs.app).
 
+## Multi-step workflows
+
+For requests that span several operations, the skill carries a **multi-step document workflow**: understand the request, inspect the document, apply targeted edits, verify the result, get human approval when the change is sensitive, then export. One prompt is enough:
+
+```
+Update the pricing section of this proposal, verify that unrelated sections
+remain unchanged, show me the proposed changes for approval, and export the
+approved version as DOCX.
+```
+
+Claude keeps large documents out of its context by editing section-precisely and reading structure rather than whole files, routes long-running work through async jobs, surfaces each sensitive change for your approval before it lands, and exports only once the edits and approvals are settled — telling you plainly what it could and couldn't verify.
+
+This is orchestration, not a new API: the workflow composes the MCP tools and patterns already documented in `skills/superdocs/SKILL.md`.
+
 ## What this plugin includes
 
 | Component | What |
