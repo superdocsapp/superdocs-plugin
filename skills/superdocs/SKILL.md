@@ -318,6 +318,64 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ---
 
+## Multi-step document workflow
+
+Use this when a request spans more than one operation — edit *and* verify, or draft *and* get approval *and* export. It composes the patterns above into the order an agent should normally follow; it introduces no new tools. For a single self-contained call ("convert this HTML to docx"), go straight to the relevant pattern instead.
+
+The stages are a default path, not a checklist to satisfy. Skip what the task doesn't need: a new document has nothing to upload, a routine edit needs no approval, a review-only request never exports.
+
+### 1. Understand the request
+
+Pin down the target document, the changes wanted, the output format, and any constraints before touching a tool. Decide which case you're in — editing an existing file (Pattern 1), drafting from scratch (Pattern 2), or editing one document while consulting another (Pattern 6). Ask the user only about gaps that change the result (jurisdiction and term for an NDA; which sections are in scope for a bulk rename); don't interrogate them about details SuperDocs will handle.
+
+### 2. Identify and inspect the document
+
+- **Already working on this document in this conversation?** Reuse its `session_id`. Sessions are sticky and persist across restarts — re-uploading starts a second copy.
+- **New document?** Per Pattern 2, initialize an empty session and let SuperDocs write it. Don't draft the HTML in your own context.
+- **Existing file?** Per Pattern 1 — base64 under 100KB, pre-signed URL above it.
+- **Need to know what's in it?** `get_document_detail` returns a `structure` outline (headings, section_count, block_count, media) without the body. Use that to locate the section you need, and ask `chat` in natural language for specific text ("what does section 4.2 currently say?"). Pulling the whole document into context — `include_html=true`, or a full-mode reply on a long document — should be a deliberate choice, not a reflex.
+
+### 3. Plan and apply changes
+
+Translate the request into targeted edits and name the position explicitly: "Rewrite Section 6 to …", "Add an Appendix A after Section 9". Section rewrites are atomic; a whole-document rebuild happens only when the user explicitly asks for one. See Pattern 3b for how the intent is read from your message.
+
+- **Document over ~20 pages** → `response_mode="compact"` on every call, so replies carry only the `chunk_diffs` for chunks that changed (Pattern 3).
+- **Document-scale generation** (long drafts, sweeping multi-section rewrites) → `chat_async`, which returns a `job_id` immediately; poll `get_job`. Sync `chat` gateway-times-out past ~300s.
+- **A job parked at `awaiting_approval` with `awaiting_kind='continue_prompt'`** is a paused large edit, not a review request — resume it with `continue_chat`, never `approve_change`.
+
+### 4. Verify the result
+
+After edits you care about, inspect rather than assume:
+
+- `get_document_detail`'s `structure` shows whether the expected headings exist and whether section/block counts moved in a way you can explain.
+- Compact-mode `chunk_diffs` show which chunks actually changed, with before/after.
+
+Be precise about what that evidence covers. Together these confirm *which* chunks were touched and that the outline is intact — they do **not** prove the prose of an untouched section is byte-identical. If the user's ask is specifically "confirm nothing else changed", say that structural checks passed and read back the specific sections they care about via `chat`; don't upgrade that into a guarantee you can't support. Never report a document as verified on evidence you didn't actually retrieve. An export is not a verification step — don't burn one for that.
+
+### 5. Obtain approval when required
+
+Routine edits (formatting, a paragraph the user dictated, drafting into an empty session) apply directly. Changes are sensitive when they alter legal or financial meaning, sweep across a document the user hasn't read, or go to an external party — those go through Pattern 4: `chat_async` with `approval_mode="ask_every_time"`, poll `get_job` to `awaiting_approval`, present each entry in `pending_changes` (`old_html` → `new_html`, plus `ai_explanation`) to the user, then `approve_change` per `change_id` with their decision.
+
+Present pending changes as pending. They are not in the document until approved, and the job resumes only once every decision is recorded. Don't approve on the user's behalf, don't batch-approve to save a round trip, and don't describe a change as made while it's still awaiting review.
+
+### 6. Export and deliver
+
+Export last — after the edits land and after any approvals resolve. `export_document` in the format the user asked for; `request_download_url` plus running the returned curl yourself when they want a file on disk (Pattern 5). Deliver the artifact with an honest account of anything unresolved: a change the user rejected, a section you couldn't verify, a step you skipped. A clean export is not evidence that the document is correct.
+
+### 7. Handle failures safely
+
+When an operation fails, stop and read what failed before doing anything else.
+
+- **Don't blindly retry a state-changing call.** A sync `chat` that timed out may still have applied its edit. Check `get_document_detail` — or `get_session_history` / `get_job` for async work — to find out what actually landed before re-sending anything.
+- **An honest failure is information.** A placement that couldn't be resolved fails rather than silently appending at the end, and a failed operation bills 0 — so fix the instruction instead of re-running the same one.
+- **Keep the session and job.** Recovery almost always means another call against the existing `session_id` or polling the existing `job_id`, not a fresh upload.
+- **A `413` `DOCUMENT_TOO_COMPLEX` / `SESSION_TOO_FULL`** is an expandable scale limit — `request_limit_increase` asks for a higher one.
+- **Pre-signed URLs expire** (5 min upload, 15 min download). Re-issue rather than treating the expiry as a hard failure.
+
+If you can't make progress, say what blocked you and what you'd need from the user. Don't substitute a plain-text rewrite for a document operation that failed.
+
+---
+
 ## Common workflows
 
 ### "Draft an NDA between X and Y"
