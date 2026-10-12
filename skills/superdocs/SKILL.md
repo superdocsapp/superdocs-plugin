@@ -1,19 +1,19 @@
 ---
 name: superdocs
-description: Edit, create, restructure, and export styled documents (.docx, PDF, HTML, Markdown, plain text) via the SuperDocs MCP server. Preserves tables, borders, shading, fonts, and inline styling on both edit and export. Use this skill when the user wants to work with formatted documents — drafting NDAs/contracts/SOPs from outlines, editing specific clauses without affecting surrounding content, converting between formats with fidelity, or running multi-step document workflows where format preservation matters more than plain text generation.
+description: Edit, create, restructure, and export styled documents (.docx, PDF, HTML, Markdown, plain text) via the Typebar MCP server (formerly SuperDocs). Preserves tables, borders, shading, fonts, and inline styling on both edit and export. Use this skill when the user wants to work with formatted documents — drafting NDAs/contracts/SOPs from outlines, editing specific clauses without affecting surrounding content, converting between formats with fidelity, or running multi-step document workflows where format preservation matters more than plain text generation.
 ---
 
-# SuperDocs Skill
+# Typebar Skill
 
-A skill for AI agents (Claude Code, Cursor, Claude Desktop, Windsurf, VS Code Copilot, etc.) connecting to the SuperDocs MCP server at `https://api.superdocs.app/mcp/`.
+A skill for AI agents (Claude Code, Cursor, Claude Desktop, Windsurf, VS Code Copilot, etc.) connecting to the Typebar MCP server at `https://api.superdocs.app/mcp/`.
 
-This skill encodes the workflows that work well with SuperDocs and the pitfalls to avoid. Read the section that matches what the user is asking for; you don't need the whole file.
+This skill encodes the workflows that work well with Typebar and the pitfalls to avoid. Read the section that matches what the user is asking for; you don't need the whole file.
 
 ---
 
 ## Setup check — run this ONCE at session start
 
-**Before reading the rest of this skill, check whether SuperDocs MCP tools are accessible.** Look for tools prefixed with `mcp__superdocs__`, `mcp__plugin_superdocs_superdocs__`, or just `superdocs__` (depending on your client).
+**Before reading the rest of this skill, check whether Typebar MCP tools are accessible.** Look for tools prefixed with `mcp__superdocs__`, `mcp__plugin_superdocs_superdocs__`, or just `superdocs__` (depending on your client). Typebar was previously called SuperDocs: the server reports its name as Typebar, while config keys and tool prefixes keep the `superdocs` label.
 
 **If yes** → MCP server is connected. Skip to "When to use" below.
 
@@ -34,30 +34,30 @@ After adding, restart your session if your client requires it (Claude Code does)
 
 ## When to use
 
-Reach for SuperDocs when **any** of these are true:
+Reach for Typebar when **any** of these are true:
 
 - **Styled document editing** — the user has a `.docx`, PDF, HTML, or styled file and wants to modify specific sections without breaking the surrounding format. Plain LLM rewrites lose tables, borders, alternating row shading, fonts.
 - **Multi-format export** — the user wants the same document in several formats: `.docx`, `.pdf`, and `.html` with consistent visual fidelity, plus Markdown and plain text.
 - **Long documents (>5 pages)** — chunk-ID-based structural editing scales to 100-page documents where naïve "rewrite the whole thing" approaches blow context windows or lose precision.
-- **Tables, borders, shading** — these survive edits in SuperDocs. Most general-purpose tools strip or mangle them.
-- **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Initialize an empty session, then call `chat` with the full draft request — SuperDocs writes the document with proper formatting in one turn. Don't generate the document HTML in your context first; that wastes thousands of tokens AND skips SuperDocs' formatting layer.
+- **Tables, borders, shading** — these survive edits in Typebar. Most general-purpose tools strip or mangle them.
+- **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Initialize an empty session, then call `chat` with the full draft request — Typebar writes the document with proper formatting in one turn. Don't generate the document HTML in your context first; that wastes thousands of tokens AND skips Typebar's formatting layer.
 - **Multi-step workflows with HITL approval** — when changes are sensitive enough that a human should approve each one before it lands.
-- **Image/diagram references** — attach screenshots, diagrams, scanned forms; SuperDocs reads them visually and edits the document accordingly.
+- **Image/diagram references** — attach screenshots, diagrams, scanned forms; Typebar reads them visually and edits the document accordingly.
 
 ## When NOT to use
 
-Skip SuperDocs (use plain text generation or a different tool) when:
+Skip Typebar (use plain text generation or a different tool) when:
 
 - The user just wants a chunk of plain text returned in chat — no file output, no styling.
 - The document has no formatting and will never need any (a `README.md` or a plain `.txt` log).
-- The user wants real-time collaborative editing with multiple people typing at once (SuperDocs is single-user-per-session).
+- The user wants real-time collaborative editing with multiple people typing at once (Typebar is single-user-per-session).
 - The user wants you to render or display an existing document's contents inline in chat — call the relevant export tool and link to the file rather than dumping HTML into the conversation.
 
 ---
 
 ## Quick start (4 install patterns)
 
-The user installs the SuperDocs MCP server in their AI tool's config. They need an API key from `https://use.superdocs.app` (Settings → API Keys → Create). Keys look like `sk_a1b2c3d4...`.
+The user installs the Typebar MCP server in their AI tool's config. They need an API key from `https://use.superdocs.app` (Settings → API Keys → Create). Keys look like `sk_a1b2c3d4...`.
 
 ### Claude Code
 
@@ -75,7 +75,7 @@ The user installs the SuperDocs MCP server in their AI tool's config. They need 
 }
 ```
 
-Restart Claude Code. The 38 SuperDocs tools become available; this skill auto-loads when document work is requested.
+Restart Claude Code. The 38 Typebar tools become available; this skill auto-loads when document work is requested.
 
 ### Cursor
 
@@ -170,7 +170,7 @@ RETURNS: { document_html with chunk IDs }
 
 ## Pattern 2 — Draft a new document from scratch
 
-**The default path: let SuperDocs write the document.** Don't draft the full HTML in your context and upload it — that wastes thousands of tokens AND yields plain HTML instead of a properly-formatted SuperDocs document. SuperDocs creates the entire document natively in one turn when you ask it to.
+**The default path: let Typebar write the document.** Don't draft the full HTML in your context and upload it — that wastes thousands of tokens AND yields plain HTML instead of a properly-formatted Typebar document. Typebar creates the entire document natively in one turn when you ask it to.
 
 ```
 STEP 1 — Initialize an empty session:
@@ -200,7 +200,7 @@ ARGS:
   filename: "final.docx"
 ```
 
-**Optional: scaffold structure first for long multi-section docs.** If the document is large enough that you want the user to react to the structure before content is generated (e.g., a 20-section employee handbook), draft a brief outline in your reply for the user to confirm, then call `chat` with that outline embedded in the message: `"Draft this document. Use this structure: 1) Introduction; 2) Scope; 3) Pricing; 4) Termination; 5) Signatures."` Same one-call pattern; SuperDocs still writes the actual content.
+**Optional: scaffold structure first for long multi-section docs.** If the document is large enough that you want the user to react to the structure before content is generated (e.g., a 20-section employee handbook), draft a brief outline in your reply for the user to confirm, then call `chat` with that outline embedded in the message: `"Draft this document. Use this structure: 1) Introduction; 2) Scope; 3) Pricing; 4) Termination; 5) Signatures."` Same one-call pattern; Typebar still writes the actual content.
 
 ---
 
@@ -245,7 +245,7 @@ Also built in:
 
 ## Pattern 4 — Human-in-the-loop approval
 
-When changes are sensitive (legal contracts, financial filings, anything that goes to an external party), ask SuperDocs to surface each change for the user to approve before applying.
+When changes are sensitive (legal contracts, financial filings, anything that goes to an external party), ask Typebar to surface each change for the user to approve before applying.
 
 ```
 STEP 1 — TOOL: chat_async
@@ -306,7 +306,7 @@ STEP 2 — Execute the returned curl command yourself via your Bash
 
 ## Pattern 6 — Reference attachments without editing them
 
-If the user wants the AI to *consult* a file (compliance manual, brand guide, prior contract) while editing a different document, upload it as an attachment — SuperDocs processes it for AI-searchable retrieval (text content is indexed for meaning-aware search; images are interpreted visually) so chat can search and cite it.
+If the user wants the AI to *consult* a file (compliance manual, brand guide, prior contract) while editing a different document, upload it as an attachment — Typebar processes it for AI-searchable retrieval (text content is indexed for meaning-aware search; images are interpreted visually) so chat can search and cite it.
 
 ```
 STEP 1 — TOOL: upload_attachment_base64 (small) or request_upload_url + process_uploaded_document with parse_mode='attachment' (large)
@@ -324,7 +324,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 1. Ask the user any missing details (jurisdiction, term length, mutual vs one-way, special carve-outs).
 2. Initialize an empty session via `upload_document_base64` with `<html><body></body></html>`.
 3. Call `chat` with the full request: `"Draft a 1-page mutual NDA between {X} and {Y}, governed by {jurisdiction} law, with a {N}-year term. Include standard sections: definitions, obligations, exclusions, term, return/destruction, no license, governing law, signatures."`
-4. SuperDocs writes the complete document in one turn.
+4. Typebar writes the complete document in one turn.
 5. Iterate via additional `chat` calls if needed (e.g., "Add an injunctive relief clause"). Each chat turn is one billable operation.
 6. `export_document` as `.docx`.
 7. Add a brief disclaimer when delivering: "This is a starting draft. Have qualified counsel review before signing — this is not legal advice."
@@ -346,11 +346,11 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 ## Pitfalls
 
-1. **Don't dump the document HTML back into chat.** Once SuperDocs has the document loaded in a session, refer to sections by description ("the second paragraph of section 3"), not by pasting HTML back. The AI already has chunk-aware access.
+1. **Don't dump the document HTML back into chat.** Once Typebar has the document loaded in a session, refer to sections by description ("the second paragraph of section 3"), not by pasting HTML back. The AI already has chunk-aware access.
 
-2. **Don't try to compute or invent chunk IDs.** Chunk IDs are SuperDocs identifiers. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying IDs SuperDocs already issued (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
+2. **Don't try to compute or invent chunk IDs.** Chunk IDs are Typebar identifiers. You receive them in some responses (HITL `pending_changes`, compact-mode `chunk_diffs`) and can pass them back when explicitly relaying IDs Typebar already issued (e.g., `change_id` in `approve_change`). You should never try to construct or guess one.
 
-3. **`session_id` is sticky.** Use the same `session_id` across all calls for one document. Generate a new one (e.g., `user-${timestamp}`) per logical document. State persists across restarts via the SuperDocs backend.
+3. **`session_id` is sticky.** Use the same `session_id` across all calls for one document. Generate a new one (e.g., `user-${timestamp}`) per logical document. State persists across restarts via the Typebar backend.
 
 4. **Default `response_mode='full'`** is fine for documents <20 pages. Switch to `compact` only when context cost matters.
 
@@ -366,7 +366,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 10. **Don't try to authenticate per-tool.** Authentication happens once at MCP server connect via the `Authorization: Bearer sk_…` header. Individual tool calls don't need extra auth.
 
-11. **Don't generate full document HTML locally for upload — let SuperDocs draft.** For from-scratch drafting, the right pattern is: initialize an empty session via `upload_document_base64` with `<html><body></body></html>`, then call `chat` with the full draft request. SuperDocs writes the document natively in one turn. Generating the full HTML in your own context and then uploading it wastes thousands of tokens AND yields plain HTML instead of a properly-formatted SuperDocs document with chunk IDs ready for further editing.
+11. **Don't generate full document HTML locally for upload — let Typebar draft.** For from-scratch drafting, the right pattern is: initialize an empty session via `upload_document_base64` with `<html><body></body></html>`, then call `chat` with the full draft request. Typebar writes the document natively in one turn. Generating the full HTML in your own context and then uploading it wastes thousands of tokens AND yields plain HTML instead of a properly-formatted Typebar document with chunk IDs ready for further editing.
 
 12. **Chunk boundaries don't always equal paragraph boundaries.** A single chunk may contain multiple paragraphs, headings, or list items (e.g., a chunk for an entire page section). When asking for narrow edits like "bold the first paragraph", be explicit about which exact text to target — `"bold only the paragraph beginning 'Curabitur', leave the following paragraphs unchanged"` — to avoid sibling-element collateral edits inside the same chunk.
 
@@ -395,4 +395,4 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 **Headless event delivery:** with `chat_async`, poll `get_job` — `metadata.intermediate_responses` carries the same typed progress events the web stream delivers (`documents_changed`, `continue_prompt`, `model_fallback`, `proposed_change_batch`). Cross-session document changes made by OTHER sessions are reported separately by polling `GET /v1/sessions/{id}/doc-events`.
 
-For full schemas and parameter descriptions, see the [SuperDocs MCP tools reference](https://docs.superdocs.app/mcp/available-tools).
+For full schemas and parameter descriptions, see the [Typebar MCP tools reference](https://docs.superdocs.app/mcp/available-tools).
