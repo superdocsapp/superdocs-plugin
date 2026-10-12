@@ -21,7 +21,7 @@ This skill encodes the workflows that work well with Typebar and the pitfalls to
 
 | Tool | Command |
 |---|---|
-| **Claude Code** | `claude mcp add --transport http superdocs https://api.superdocs.app/mcp/ --header "Authorization: Bearer sk_YOUR_KEY"` (or just install the plugin which bundles MCP + skill + 4 prompts: `claude plugin marketplace add superdocsapp/superdocs-plugin && claude plugin install superdocs@superdocs-plugin`) |
+| **Claude Code** | `claude mcp add -s user --transport http superdocs https://api.superdocs.app/mcp/ --header "Authorization: Bearer sk_YOUR_KEY"` (or just install the plugin which bundles MCP + skill + 4 prompts: `claude plugin marketplace add superdocsapp/superdocs-plugin && claude plugin install superdocs@superdocs-plugin`) |
 | **Cursor** | Add to `.cursor/mcp.json`: `{"mcpServers":{"superdocs":{"url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
 | **VS Code** | Add to workspace `.vscode/mcp.json` (or the user-level `mcp.json` via **MCP: Open User Configuration**): `{"servers":{"superdocs":{"type":"http","url":"https://api.superdocs.app/mcp/","headers":{"Authorization":"Bearer sk_YOUR_KEY"}}}}` |
 | **Cline / Continue / Goose / Gemini CLI / others** | See client-specific docs at https://docs.superdocs.app/mcp/setup — config file format varies. |
@@ -37,12 +37,13 @@ After adding, restart your session if your client requires it (Claude Code does)
 Reach for Typebar when **any** of these are true:
 
 - **Styled document editing** — the user has a `.docx`, PDF, HTML, or styled file and wants to modify specific sections without breaking the surrounding format. Plain LLM rewrites lose tables, borders, alternating row shading, fonts.
-- **Multi-format export** — the user wants the same document in several formats: `.docx`, `.pdf`, and `.html` with consistent visual fidelity, plus Markdown and plain text.
+- **Multi-format export** — the user wants the same document as `.docx`, `.pdf`, `.html`, Markdown, or plain text with consistent visual fidelity.
 - **Long documents (>5 pages)** — chunk-ID-based structural editing scales to 100-page documents where naïve "rewrite the whole thing" approaches blow context windows or lose precision.
 - **Tables, borders, shading** — these survive edits in Typebar. Most general-purpose tools strip or mangle them.
 - **From-scratch drafting that needs format from day one** — e.g., NDAs, contracts, SOPs, letterheaded memos, formal reports. Initialize an empty session, then call `chat` with the full draft request — Typebar writes the document with proper formatting in one turn. Don't generate the document HTML in your context first; that wastes thousands of tokens AND skips Typebar's formatting layer.
 - **Multi-step workflows with HITL approval** — when changes are sensitive enough that a human should approve each one before it lands.
 - **Image/diagram references** — attach screenshots, diagrams, scanned forms; Typebar reads them visually and edits the document accordingly.
+- **Visual content inside the document** — ask the AI to generate an image (photorealistic shots, logos, infographics), edit any existing image in plain English ("brighten this", "remove the background", "recolor with warm sepia"), insert auto-rendered diagrams (flowchart / sequence / mindmap / ER), drop in math equations, or add a self-updating table of contents. All by chatting; everything exports cleanly to `.docx` and PDF.
 
 ## When NOT to use
 
@@ -61,7 +62,7 @@ The user installs the Typebar MCP server in their AI tool's config. They need an
 
 ### Claude Code
 
-`~/.config/claude-code/mcp.json`:
+A project's `.mcp.json` file (or run the `claude mcp add` command in the table above, which writes this for you):
 
 ```json
 {
@@ -127,7 +128,7 @@ Workspace `.vscode/mcp.json` (or the user-level `mcp.json`, opened with the **MC
 
 ## Pattern 1 — Upload an existing file the user wants to edit
 
-**Files <100KB** (small contracts, single-page memos, brief outlines): inline base64 is fine.
+**Files smaller than 100KB** (small contracts, single-page memos, brief outlines): inline base64 is fine.
 
 ```
 TOOL: upload_document_base64
@@ -164,7 +165,7 @@ ARGS:
 RETURNS: { document_html with chunk IDs }
 ```
 
-**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — in a typical 200K-token context window that's ~70% gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
+**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — a large share of your context window gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
 
 ---
 
@@ -238,7 +239,7 @@ Also built in:
 - **Placement is honored** — "at the top", "in Section 2", "replace the [COVER] placeholder". A named position that can't be resolved fails honestly (never silently appended at the end). "Move the org chart into Section 2" relocates the original — no duplication.
 - **Page breaks & TOC** — "page break before each section" inserts real markers (true Word page breaks / PDF breaks on export); "add a table of contents" inserts a live TOC that self-updates from headings.
 - **Verify for free** — `get_document_detail` always includes a `structure` outline (headings, section_count, block_count, media). Check it after edits you care about; never burn an export just to verify.
-- **Failed operations bill 0** — if the reply says the edit couldn't be completed, you were not charged. Most requests bill 1 op; very large creations bill 1 per 25 sections.
+- **Failed operations bill 0** — if the reply says the edit couldn't be completed, you were not charged. Most requests bill 1 op; very large edits or creations bill 1 per 25 sections.
 - **Document-scale generations → `chat_async`** — sync chat gateway-times-out past ~300s; async returns a `job_id` immediately and reports progress via `get_job`.
 
 ---
@@ -272,6 +273,18 @@ ARGS:
 
 Once all decisions are recorded, the job auto-resumes and applies the approved changes.
 
+**A large edit can pause to ask whether to keep going — that's a different signal from an approval.** On very large edits the job may stop partway through with a *continue prompt* rather than pending changes: `get_job` shows `status='awaiting_approval'` with `metadata.awaiting_kind='continue_prompt'` (over SSE you'd see a `continue_prompt` event). Resume it with `continue_chat`, **not** `approve_change`:
+
+```
+TOOL: continue_chat
+ARGS:
+  session_id: "user-session-1"
+  job_id: <from chat_async>
+  continue: true    # finish the rest; false = stop and keep what's already applied
+```
+
+Calling `approve_change` on a continue-prompt pause won't work — it's the wrong tool for that pause kind. Check `metadata.awaiting_kind`: `pending_changes` present → use `approve_change`; `awaiting_kind='continue_prompt'` → use `continue_chat`.
+
 ---
 
 ## Pattern 5 — Export & deliver
@@ -282,17 +295,27 @@ After the user is happy with the document:
 TOOL: export_document
 ARGS:
   session_id: "user-session-1"
-  format: "docx"   # or pdf / html / markdown / txt
-  filename: "delivery.docx"
+  format: "docx"   # or "pdf", "html", "markdown", "txt"
+  options:
+    filename: "delivery"
+    paper_size: "Letter"    # or "A4", "A3", "Legal"
 ```
 
-For files the user needs to download (rather than viewing inline), use the pre-signed download URL flow:
+For files the user needs to download (rather than viewing inline), use the pre-signed download URL flow. `request_download_url` re-exports the session's current document and hands back a short-lived GET URL — you do **not** call `export_document` first, and there is no blob path to pass:
 
 ```
-STEP 1 — TOOL: request_download_url with session_id (it re-exports the
-         session's current document and returns a short-lived signed
-         download URL + a curl command). Args: session_id (required),
-         format ("docx"/"pdf"/"html"/"markdown"/"txt"), optional filename.
+STEP 1 — TOOL: request_download_url
+ARGS:
+  session_id: "user-session-1"   # required
+  format: "docx"                 # or "pdf" (native PDF), "html", "markdown", "txt"
+  filename: "delivery"           # optional
+RETURNS: { download_url, curl_example }
+
+NOTE — request_download_url does not apply paper size or margins. For
+       those, call export_document with `options` instead (as an MCP
+       tool it also returns .docx and .pdf as a short-lived signed
+       download_url).
+
 STEP 2 — Execute the returned curl command yourself via your Bash
          tool to save the file to the user's working directory. Do
          not paste the curl command back to the user expecting them
@@ -325,7 +348,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 2. Initialize an empty session via `upload_document_base64` with `<html><body></body></html>`.
 3. Call `chat` with the full request: `"Draft a 1-page mutual NDA between {X} and {Y}, governed by {jurisdiction} law, with a {N}-year term. Include standard sections: definitions, obligations, exclusions, term, return/destruction, no license, governing law, signatures."`
 4. Typebar writes the complete document in one turn.
-5. Iterate via additional `chat` calls if needed (e.g., "Add an injunctive relief clause"). Each chat turn is one billable operation.
+5. Iterate via additional `chat` calls if needed (e.g., "Add an injunctive relief clause"). Each chat turn is one billable operation (very large edits: one operation per 25 sections edited).
 6. `export_document` as `.docx`.
 7. Add a brief disclaimer when delivering: "This is a starting draft. Have qualified counsel review before signing — this is not legal advice."
 
@@ -352,7 +375,7 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 
 3. **`session_id` is sticky.** Use the same `session_id` across all calls for one document. Generate a new one (e.g., `user-${timestamp}`) per logical document. State persists across restarts via the Typebar backend.
 
-4. **Default `response_mode='full'`** is fine for documents <20 pages. Switch to `compact` only when context cost matters.
+4. **Default `response_mode='full'`** is fine for documents under 20 pages. Switch to `compact` only when context cost matters.
 
 5. **`parse_mode` matters for `process_uploaded_document`** — `'document'` loads as the active editable doc, `'attachment'` loads as a read-only AI-searchable reference. Don't mix them up.
 
@@ -375,18 +398,17 @@ STEP 3 — Continue with chat. The AI now has the attachment available for retri
 ## Tool reference (38 tools — full descriptions in `available-tools.mdx`)
 
 **Chat & editing:** `chat`, `chat_async`, `approve_change`, `continue_chat`, `revert_session_to_message`, `redo_revert`
-**Multi-document sessions (tabs):** `init_session`, `open_documents`, `list_session_documents`, `focus_session_document`, `close_session_document`
-**Files (durable, reusable documents):** `list_documents`, `get_document_detail`, `rename_document`, `archive_document`, `unarchive_document`
 **Document upload/parse:** `upload_document_base64`, `request_upload_url`, `process_uploaded_document`
 **Document export/download:** `export_document`, `request_download_url`
 **Sessions:** `list_sessions`, `get_session_history`, `get_session_jobs`
+**Session documents (multi-document tabs):** `list_session_documents`, `focus_session_document`, `close_session_document` — a session can hold several open documents; pass `document_id` on `chat`/`chat_async` to target one, or let turns hit the focused document
+**Files (durable, reusable documents):** `list_documents`, `get_document_detail`, `rename_document`, `archive_document` (soft delete, recoverable ~30 days), `unarchive_document` (restore an archived document), `open_documents`, `init_session` — documents persist across sessions; reopen, rename, archive, or restore them
+**Cross-session memory:** `clear_cross_session_memory` (wipes the opt-in memory note)
 **Attachments (reference files):** `upload_attachment_base64`, `delete_attachment`, `get_attachment_status`
 **Images:** `upload_image_base64` (upload an image as base64, get back a hosted URL to reference in chat: "insert my logo at the top")
 **Async jobs:** `list_jobs`, `get_job`, `cancel_job`
 **Templates:** `upload_template_base64`, `list_user_templates`, `delete_user_template`
-**Cross-session memory:** `clear_cross_session_memory`
-**Account:** `get_account_status` (tier, operations used/remaining this month, reset date; non-billable)
-- `request_limit_increase` — one-call request for higher document/chat scale limits after a 413 DOCUMENT_TOO_COMPLEX / SESSION_TOO_FULL (stability limits, expandable per account, typically within a day)
+**Account:** `get_account_status` (tier, operations used/remaining this month, reset date; non-billable), `request_limit_increase` (one-call request for higher document/chat scale limits after a 413 DOCUMENT_TOO_COMPLEX / SESSION_TOO_FULL; stability limits, expandable per account, typically within a day)
 **Health:** `health`
 
 **Token-light reads:** the session-roster + Files tools (`list_session_documents`, `open_documents`, `init_session`, `focus_session_document`, `close_session_document`, `list_documents`) return metadata only by default (ids, title, section counts, focused, page setup) — pass `include_html=true` only when you actually need a document's body.
