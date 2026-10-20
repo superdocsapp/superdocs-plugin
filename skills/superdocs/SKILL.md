@@ -165,7 +165,7 @@ ARGS:
 RETURNS: { document_html with chunk IDs }
 ```
 
-**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — a large share of your context window gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
+**Why this matters:** A 100KB docx becomes ~140K base64 chars in your context — in a typical 200K-token context window that's ~70% gone before the user has even asked a question. The pre-signed URL flow keeps bytes out of context entirely.
 
 ---
 
