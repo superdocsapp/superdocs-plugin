@@ -1,14 +1,15 @@
 {
   "name": "superdocs",
+  "displayName": "Typebar (formerly SuperDocs)",
   "version": "1.3.0",
-  "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / plain text) via the SuperDocs MCP server. Single install bundles 38 MCP tools, 4 user-invocable workflow prompts, and a skill that auto-loads when document work is requested.",
+  "description": "Typebar (formerly SuperDocs), the document harness for your AI: edit, draft, search, summarize and export styled documents (.docx / PDF / HTML / Markdown / plain text) via the Typebar MCP server. Single install bundles 38 MCP tools, 4 user-invocable workflow prompts and a skill that auto-loads when document work is requested.",
   "author": {
-    "name": "SuperDocs",
+    "name": "Typebar",
     "email": "hello@superdocs.app",
-    "url": "https://superdocs.app"
+    "url": "https://typebar.ai"
   },
   "repository": "https://github.com/superdocsapp/superdocs-plugin",
-  "homepage": "https://docs.superdocs.app",
+  "homepage": "https://docs.typebar.ai",
   "license": "MIT",
   "keywords": [
     "document",
@@ -18,6 +19,7 @@
     "mcp",
     "ai",
     "superdocs",
+    "typebar",
     "contract",
     "nda",
     "structural-editing"
@@ -25,8 +27,8 @@
   "userConfig": {
     "api_key": {
       "type": "string",
-      "title": "SuperDocs API Key",
-      "description": "Your sk_ API key from https://use.superdocs.app/ → Settings → API Keys → Create. Stored securely in your OS keychain (never in plaintext config). Free plan includes 500 AI operations per month.",
+      "title": "Typebar API Key",
+      "description": "Your Typebar (formerly SuperDocs) sk_ API key from https://use.typebar.ai/ → Settings → API Keys → Create. Stored securely in your OS keychain (never in plaintext config). Free plan includes 500 AI operations per month.",
       "sensitive": true,
       "required": true
     }

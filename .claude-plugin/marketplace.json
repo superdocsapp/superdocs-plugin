@@ -1,15 +1,16 @@
 {
   "name": "superdocs-plugin",
+  "description": "Typebar (formerly SuperDocs), the document harness for your AI: the Claude Code plugin for AI document editing.",
   "owner": {
-    "name": "SuperDocs",
+    "name": "Typebar",
     "email": "hello@superdocs.app",
-    "url": "https://superdocs.app"
+    "url": "https://typebar.ai"
   },
   "plugins": [
     {
       "name": "superdocs",
       "source": "./",
-      "description": "Edit, draft, search, summarize, and export styled documents (.docx / PDF / HTML / Markdown / plain text) via the SuperDocs MCP server. Single install bundles 38 MCP tools, 4 user-invocable workflow prompts, and a skill that auto-loads when document work is requested."
+      "description": "Typebar (formerly SuperDocs), the document harness for your AI: edit, draft, search, summarize and export styled documents (.docx / PDF / HTML / Markdown / plain text) via the Typebar MCP server. Single install bundles 38 MCP tools, 4 user-invocable workflow prompts and a skill that auto-loads when document work is requested."
     }
   ]
 }

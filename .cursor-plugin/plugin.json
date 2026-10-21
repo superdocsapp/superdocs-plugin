@@ -1,14 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/cursor/plugins/main/schemas/plugin.schema.json",
   "name": "superdocs",
-  "displayName": "SuperDocs",
+  "displayName": "Typebar (formerly SuperDocs)",
   "version": "1.3.0",
-  "description": "Structured-document editor for AI agents — 38 MCP tools for section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download. Exports .docx, PDF, HTML, Markdown, plain text; ingests .pdf, .docx, .txt, .rtf, .md, .html, .htm.",
+  "description": "Typebar (formerly SuperDocs), the document harness for your AI: a structured-document editor for AI agents. 38 MCP tools for section-precise edits with table/border/font preservation, multi-format export, pre-signed URL upload/download. Exports .docx, PDF, HTML, Markdown, plain text; ingests .pdf, .docx, .txt, .rtf, .md, .html, .htm.",
   "author": {
-    "name": "SuperDocs",
+    "name": "Typebar",
     "email": "hello@superdocs.app"
   },
-  "homepage": "https://docs.superdocs.app",
+  "homepage": "https://docs.typebar.ai",
   "repository": "https://github.com/superdocsapp/superdocs-plugin",
   "license": "MIT",
   "keywords": [
@@ -18,6 +18,8 @@
     "editing",
     "mcp",
     "ai",
+    "typebar",
+    "superdocs",
     "structural-editing",
     "contract",
     "nda",
