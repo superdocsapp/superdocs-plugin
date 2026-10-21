@@ -31,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **`redo_revert`** — undo a revert: restore the session forward to its pre-revert state. The mirror of `revert_session_to_message`.
 - Token-light reads: the session-roster + Files reads (including the `get_document_detail` lookup) return metadata only by default — ids, title, section counts, focused flag, page setup; pass `include_html=true` only when you need a document's body. On `chat` / `chat_async`, `response_mode='compact'` returns just the per-section diffs that changed instead of the full document.
 - Loading a document is not itself a billable operation — `upload_document_base64` (and uploading a reference file as an attachment) does not consume an operation; you're charged for the AI edits/drafts you run, not for parsing a file into the editor.
-- **Concurrent-edit conflict resolution (REST, not an MCP tool):** `POST /v1/sessions/{session_id}/chunks/{chunk_id}/re-edit` re-applies the AI's change over a user's current text, or blends the two, for one section. It runs one billable AI edit — for integrators running their own editor.
 
 ### Changed
 - **Export-format correction:** exports are `.docx`, PDF, HTML, Markdown, and plain text. RTF is an **input/upload** format only — it is no longer listed as an export format anywhere.
